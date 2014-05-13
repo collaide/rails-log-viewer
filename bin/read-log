@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+if ARGV.empty?
+  puts 'You need to provide the execution path of logstash'
+  exit(0)
+end
+require 'log/parser'
+Log::Parser.create_log_file
+dir = File.join(Dir.home, '.log-parser')
+
+case ARGV[0]
+  when 'quit'
+    pid = IO.read(File.join(dir, 'logstash.pid'))
+    Process.kill(9, pid.to_i)
+    exit(0)
+  when 'reset'
+    FileUtils.rm File.join(dir, '.line'), force: true
+    exit(0)
+end
+
+quickstart = File.join(dir, 'quickstart.conf')
+quistart_content = <<-EOD
+input {
+  file {
+    type => "rails logs"
+    path => "#{File.join(dir, 'logstash.log')}"
+    codec =>   json {
+      charset => "UTF-8"
+    }
+  }
+}
+
+output {
+  # Print each event to stdout.
+  stdout {
+    codec => rubydebug
+  }
+
+  elasticsearch {
+    embedded => true
+  }
+}
+
+EOD
+
+IO.write(quickstart, quistart_content)
+logstash = ARGV[0]
+puts logstash
+pid = exec(
+    "GEM_HOME=#{File.join(logstash, 'vendor', 'bundle', 'jruby', '1.9')} java -Djava.awt.headless=true -Des.path.data=\"#{dir}\" -jar #{File.join(logstash, 'vendor', 'jar', 'jruby-complete-1.7.11.jar')} -I #{File.join(logstash, 'lib')} #{File.join(logstash, 'lib', 'logstash', 'runner.rb')} agent -w 1 -e '#{quistart_content}'")
+#IO.write(File.join(dir, 'logstash.pid'), pid.to_s)
+#Log::Parser.fetch_log ARGV[1], ARGV[2], ARGV[3], ARGV[4]

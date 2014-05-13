@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+require 'log/parser'
+
+def configure
+  puts 'What is the address of the remote server ?'
+  @server = gets.chomp
+  puts 'What the path of the log on the remote host ?'
+  @remote_path = gets.chomp
+  puts 'What is the user name ?'
+  @user_name = gets.chomp
+  puts 'What is the password ? (ignore it if you have public key)'
+  @password = gets.chomp
+  puts 'Is that correct(y/n) :'+"\nserver address: #{@server}\n log path: #{@remote_path}\n username: #{@user_name}\npassword: ********"
+  if gets.chomp == 'y'
+
+  end
+end
+
+if ARGV.empty?
+else
+  Log::Parser.fetch_log ARGV[0], ARGV[1], ARGV[2], ARGV[3]
+end
