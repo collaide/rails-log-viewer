@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'log/parser/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "log-parser"
+  spec.name          = "rails-log-viewer"
   spec.version       = Log::Parser::VERSION
   spec.authors       = ["leo"]
   spec.email         = ["facenord.sud@gmail.com"]
