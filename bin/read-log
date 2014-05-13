@@ -34,14 +34,14 @@ input {
 filter {
  if [fields][ip] {
     geoip {
-         source => "[fields][ip]"
-         target => "geoip"
-         add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
-         add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
-    }
-    mutate {
-      convert => [ "[geoip][coordinates]", "float" ]
-    }
+       source => "[@fields][ip]"
+       target => "geoip"
+       add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+       add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+  }
+  mutate {
+    convert => [ "[geoip][coordinates]", "float" ]
+  }
   }
 }
 
