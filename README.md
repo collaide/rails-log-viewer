@@ -6,6 +6,8 @@ This solution has the adventage that it doesn't require any remote server to run
 
 What it does is to fetch the remote logs to your locale machine and start logstash with kibana if needed
 
+
+
 ## Installation
 
 Install the gem:
@@ -33,11 +35,15 @@ And provide your logstash executable (usually under: `logstash-1.x.x/bin/logstas
 
 Now you can run logstash: ` read-log ` and then fetch the log: ` fetch-log `. Each times the logs has changed and you want to read it, run. ` fetch-log `.
 
+Go to ` localhost:9292 ` to view your logs !
+
 When you are done, run: ` read-log quit `
 
 If you delete the log file to the server and want to parse it from the beginning, run: `read-log reset`
 
 Every created files by this gem are under `$HOME/.log-parser`. Config files are .config for server access and .config-read for logstash executable
+
+To configure lograge go to his github repo. Otherwise is a good idea to read the logstash doc!
 
 ## Contributing
 
