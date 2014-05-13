@@ -6,7 +6,7 @@ This solution has the adventage that it doesn't require any remote server to run
 
 What it does is to fetch the remote logs to your locale machine and start logstash with kibana if needed
 
-
+![Your awsome logs](https://raw.githubusercontent.com/collaide/rails-log-viewer/master/logstash.jpg)
 
 ## Installation
 
