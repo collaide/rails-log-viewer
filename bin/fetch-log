@@ -1,22 +1,35 @@
 #!/usr/bin/env ruby
 require 'log/parser'
+require 'json'
 
+dir = File.join(Dir.home, '.log-parser')
+Dir.mkdir(dir) unless Dir.exist?(dir)
+config = File.join(dir, '.config')
 def configure
-  puts 'What is the address of the remote server ?'
-  @server = gets.chomp
-  puts 'What the path of the log on the remote host ?'
-  @remote_path = gets.chomp
-  puts 'What is the user name ?'
-  @user_name = gets.chomp
-  puts 'What is the password ? (ignore it if you have public key)'
-  @password = gets.chomp
-  puts 'Is that correct(y/n) :'+"\nserver address: #{@server}\n log path: #{@remote_path}\n username: #{@user_name}\npassword: ********"
-  if gets.chomp == 'y'
 
-  end
 end
 
-if ARGV.empty?
+if ARGV.empty? and File.exists? config
+  options = JSON.parse(IO.read(config))
+  Log::Parser.fetch_log options['server'], options['remote_path'], options['user_name'], options['password']
+  exit(0)
+elsif ARGV.empty?
+  puts 'What is the address of the remote server ?'
+  options = {}
+  options[:server] = gets.chomp
+  puts 'What the path of the log on the remote host ?'
+  options[:remote_path] = gets.chomp
+  puts 'What is the user name ?'
+  options[:user_name] = gets.chomp
+  puts 'What is the password ? (ignore it if you have public key)'
+  options[:password] = gets.chomp unless gets.chomp == ''
+  puts 'Is that correct(y/n) :'+"\nserver address: #{options[:server]}\n log path: #{options[:remote_path]}\n username: #{options[:user_name]}\npassword: ********"
+  if gets.chomp == 'y'
+    IO.write(config, options.to_json)
+  else
+    puts 'config aborted.'
+  end
+  exit(0)
 else
   Log::Parser.fetch_log ARGV[0], ARGV[1], ARGV[2], ARGV[3]
 end

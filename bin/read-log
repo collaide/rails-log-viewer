@@ -1,19 +1,21 @@
 #!/usr/bin/env ruby
-if ARGV.empty?
-  puts 'You need to provide the execution path of logstash'
-  exit(0)
-end
 require 'log/parser'
 Log::Parser.create_log_file
 dir = File.join(Dir.home, '.log-parser')
-
+config = File.join(dir, '.read-config')
 case ARGV[0]
   when 'quit'
     pid = IO.read(File.join(dir, 'logstash.pid'))
     Process.kill(9, pid.to_i)
+    puts 'logstash killed.'
     exit(0)
   when 'reset'
     FileUtils.rm File.join(dir, '.line'), force: true
+    puts 'Parsing log file from beginning'
+    exit(0)
+  when 'config'
+    IO.write(config, ARGV[1])
+    puts 'config file written.'
     exit(0)
 end
 
@@ -25,6 +27,20 @@ input {
     path => "#{File.join(dir, 'logstash.log')}"
     codec =>   json {
       charset => "UTF-8"
+    }
+  }
+}
+
+filter {
+ if [fields][ip] {
+    geoip {
+         source => "[fields][ip]"
+         target => "geoip"
+         add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+         add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    mutate {
+      convert => [ "[geoip][coordinates]", "float" ]
     }
   }
 }
@@ -43,10 +59,13 @@ output {
 EOD
 
 IO.write(quickstart, quistart_content)
-logstash = ARGV[0]
-puts 'Run this line of code to start logstash: '
-puts "GEM_HOME=#{File.join(logstash, 'vendor', 'bundle', 'jruby', '1.9')} java -Djava.awt.headless=true -Des.path.data=\"#{dir}\" -jar #{File.join(logstash, 'vendor', 'jar', 'jruby-complete-1.7.11.jar')} -I#{File.join(logstash, 'lib')} #{File.join(logstash, 'lib', 'logstash', 'runner.rb')} agent -w 1 -f #{quickstart} -- web"
-# pid = exec(
-#     "GEM_HOME=#{File.join(logstash, 'vendor', 'bundle', 'jruby', '1.9')} java -Djava.awt.headless=true -Des.path.data=\"#{dir}\" -jar #{File.join(logstash, 'vendor', 'jar', 'jruby-complete-1.7.11.jar')} -I#{File.join(logstash, 'lib')} #{File.join(logstash, 'lib', 'logstash', 'runner.rb')} agent -w 1 -e '#{quistart_content}'")
-#IO.write(File.join(dir, 'logstash.pid'), pid.to_s)
-#Log::Parser.fetch_log ARGV[1], ARGV[2], ARGV[3], ARGV[4]
+if ARGV.empty?
+  logstash = IO.read(config)
+else
+  logstash = ARGV[0]
+end
+puts 'Copy and execute this line:'
+puts "JAVA_OPTS=-Des.path.data=\"#{dir}\" #{logstash} agent -f #{quickstart} -- web & echo $! > #{File.join(dir, 'logstash.pid')}"
+puts 'and run fetch-log'
+puts 'run read-log quit to quit logstash'
+puts 'run read-log reset to parse the log file from beginning'
