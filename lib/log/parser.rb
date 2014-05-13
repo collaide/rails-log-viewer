@@ -12,6 +12,7 @@ module Log
       dir = File.join(Dir.home, '.log-parser')
       log = File.join(dir, 'tmp.log')
       Dir.mkdir(dir) unless Dir.exist?(dir)
+      puts 'fetching log...'
       Net::SCP::download!(server, user_name, remote_path, log)
       puts 'reading log...'
       file_line_path = File.join(dir, '.line')

@@ -44,8 +44,9 @@ EOD
 
 IO.write(quickstart, quistart_content)
 logstash = ARGV[0]
-puts logstash
-pid = exec(
-    "GEM_HOME=#{File.join(logstash, 'vendor', 'bundle', 'jruby', '1.9')} java -Djava.awt.headless=true -Des.path.data=\"#{dir}\" -jar #{File.join(logstash, 'vendor', 'jar', 'jruby-complete-1.7.11.jar')} -I #{File.join(logstash, 'lib')} #{File.join(logstash, 'lib', 'logstash', 'runner.rb')} agent -w 1 -e '#{quistart_content}'")
+puts 'Run this line of code to start logstash: '
+puts "GEM_HOME=#{File.join(logstash, 'vendor', 'bundle', 'jruby', '1.9')} java -Djava.awt.headless=true -Des.path.data=\"#{dir}\" -jar #{File.join(logstash, 'vendor', 'jar', 'jruby-complete-1.7.11.jar')} -I#{File.join(logstash, 'lib')} #{File.join(logstash, 'lib', 'logstash', 'runner.rb')} agent -w 1 -f #{quickstart} -- web"
+# pid = exec(
+#     "GEM_HOME=#{File.join(logstash, 'vendor', 'bundle', 'jruby', '1.9')} java -Djava.awt.headless=true -Des.path.data=\"#{dir}\" -jar #{File.join(logstash, 'vendor', 'jar', 'jruby-complete-1.7.11.jar')} -I#{File.join(logstash, 'lib')} #{File.join(logstash, 'lib', 'logstash', 'runner.rb')} agent -w 1 -e '#{quistart_content}'")
 #IO.write(File.join(dir, 'logstash.pid'), pid.to_s)
 #Log::Parser.fetch_log ARGV[1], ARGV[2], ARGV[3], ARGV[4]
